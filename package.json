@@ -1,0 +1,19 @@
+{
+  "name": "@dwellsmith/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for Dwellsmith household management",
+  "type": "module",
+  "bin": {
+    "dwellsmith-mcp": "./index.js",
+    "dwellsmith-mcp-setup": "./setup.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.2"
+  },
+  "license": "MIT"
+}
