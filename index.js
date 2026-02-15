@@ -307,6 +307,22 @@ server.tool(
   }
 );
 
+// ── get_relationship ─────────────────────────────────────────────────────────
+
+server.tool(
+  "get_relationship",
+  "Get full details of a specific relationship/contact by ID, including interaction history",
+  {
+    id: idSchema.describe("Relationship ID"),
+  },
+  async ({ id }) => {
+    try {
+      const data = await api("GET", `/relationships/${id}`);
+      return jsonResult(data.data || data);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
 // ── create_relationship ──────────────────────────────────────────────────────
 
 server.tool(
