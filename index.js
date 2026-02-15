@@ -80,6 +80,12 @@ function jsonResult(data) {
 }
 
 function errorResult(err) {
+  if (err.name === "TimeoutError" || err.name === "AbortError") {
+    return textResult(`❌ Request timed out after ${TIMEOUT / 1000}s — the Dwellsmith API may be slow or unreachable. Try again shortly.`);
+  }
+  if (err.code === "ENOTFOUND" || err.code === "ECONNREFUSED") {
+    return textResult(`❌ Cannot reach ${BASE_URL} — check your internet connection or run \`node setup.js\` to reconfigure.`);
+  }
   return textResult(`❌ ${err.message}`);
 }
 
