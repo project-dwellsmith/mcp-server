@@ -188,6 +188,22 @@ server.tool(
   }
 );
 
+// ── get_task ─────────────────────────────────────────────────────────────────
+
+server.tool(
+  "get_task",
+  "Get full details of a specific task by ID",
+  {
+    id: idSchema.describe("Task ID"),
+  },
+  async ({ id }) => {
+    try {
+      const data = await api("GET", `/tasks/${id}`);
+      return jsonResult(data.data || data);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
 // ── update_task ──────────────────────────────────────────────────────────────
 
 server.tool(
