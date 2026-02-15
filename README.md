@@ -2,6 +2,30 @@
 
 Dwellsmith lets you manage your household just by talking to Claude. Tasks, contacts, helpers, home maintenance — just say what you need in plain English, and Claude takes care of the rest. No apps to switch between, no forms to fill out.
 
+## Tools available (20 total)
+
+| Tool | Description |
+|---|---|
+| `health_check` | Test connection to Dwellsmith |
+| `list_tasks` | List tasks with filters |
+| `create_task` | Create a new task |
+| `update_task` | Update task details |
+| `delete_task` | Delete a task |
+| `complete_task` | Mark a task complete |
+| `get_household` | Household dashboard |
+| `list_relationships` | List contacts |
+| `create_relationship` | Add a new contact |
+| `due_contacts` | Contacts due for outreach |
+| `log_interaction` | Log a call/text/visit |
+| `list_helpers` | List household helpers |
+| `create_helper` | Add a new helper |
+| `log_visit` | Log a helper visit |
+| `log_payment` | Log a helper payment |
+| `list_maintenance` | List maintenance items |
+| `create_maintenance` | Add maintenance item |
+| `complete_maintenance` | Mark maintenance done |
+| `quick_capture` | Natural language capture |
+
 ## What can you do with it?
 
 Here are real things you can say to Claude once Dwellsmith is set up:
@@ -126,6 +150,16 @@ The setup step didn't finish. Run `node setup.js` again from the mcp-server fold
 
 This can happen if your internet connection is spotty or Dwellsmith's servers are briefly busy. Wait a moment and try again.
 
+
+## Development
+
+```bash
+# Run tests
+npm test
+
+# Start the server directly
+npm start
+```
 
 ## Privacy
 
