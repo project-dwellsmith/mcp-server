@@ -182,6 +182,50 @@ server.tool(
   }
 );
 
+// ── update_task ──────────────────────────────────────────────────────────────
+
+server.tool(
+  "update_task",
+  "Update an existing task's details",
+  {
+    id: idSchema.describe("Task ID"),
+    title: z.string().min(1).max(500).optional().describe("New title"),
+    description: z.string().optional().describe("New description"),
+    category: z.string().optional().describe("New category"),
+    priority: z.number().min(1).max(5).optional().describe("New priority 1-5"),
+    due_date: dateSchema.optional().describe("New due date (YYYY-MM-DD)"),
+  },
+  async ({ id, title, description, category, priority, due_date }) => {
+    try {
+      const body = {};
+      if (title !== undefined) body.title = title;
+      if (description !== undefined) body.description = description;
+      if (category !== undefined) body.category = category;
+      if (priority !== undefined) body.priority = priority;
+      if (due_date !== undefined) body.due_date = due_date;
+      if (Object.keys(body).length === 0) return textResult("Nothing to update — provide at least one field to change.");
+      const data = await api("PUT", `/tasks/${id}`, body);
+      return textResult(`✅ Task ${id} updated.`);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
+// ── delete_task ──────────────────────────────────────────────────────────────
+
+server.tool(
+  "delete_task",
+  "Delete a task permanently",
+  {
+    id: idSchema.describe("Task ID"),
+  },
+  async ({ id }) => {
+    try {
+      await api("DELETE", `/tasks/${id}`);
+      return textResult(`✅ Task ${id} deleted.`);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
 // ── complete_task ────────────────────────────────────────────────────────────
 
 server.tool(
