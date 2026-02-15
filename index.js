@@ -83,6 +83,15 @@ function errorResult(err) {
   return textResult(`❌ ${err.message}`);
 }
 
+// ── Validation helpers ───────────────────────────────────────────────────────
+
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format").refine((s) => {
+  const d = new Date(s + "T00:00:00Z");
+  return !isNaN(d.getTime());
+}, "Invalid date — check month and day values");
+
+const idSchema = z.number().int().positive("ID must be a positive integer");
+
 // ── MCP Server ───────────────────────────────────────────────────────────────
 
 const server = new McpServer({
@@ -152,11 +161,11 @@ server.tool(
   "create_task",
   "Create a new household task",
   {
-    title: z.string().describe("Task title"),
+    title: z.string().min(1, "Title cannot be empty").max(500).describe("Task title"),
     description: z.string().optional().describe("Task description"),
     category: z.string().optional().describe("Category (e.g. cleaning, errands, repairs)"),
     priority: z.number().min(1).max(5).optional().describe("Priority 1-5 (1=highest)"),
-    due_date: z.string().optional().describe("Due date (YYYY-MM-DD)"),
+    due_date: dateSchema.optional().describe("Due date (YYYY-MM-DD)"),
     recurrence: z.string().optional().describe("Recurrence type: daily, weekly, monthly, or null for one-time"),
   },
   async ({ title, description, category, priority, due_date, recurrence }) => {
@@ -179,7 +188,7 @@ server.tool(
   "complete_task",
   "Mark a task as complete",
   {
-    id: z.number().describe("Task ID"),
+    id: idSchema.describe("Task ID"),
     notes: z.string().optional().describe("Completion notes"),
   },
   async ({ id, notes }) => {
@@ -256,12 +265,12 @@ server.tool(
   "log_interaction",
   "Log an interaction with a relationship (call, text, visit, etc.)",
   {
-    id: z.number().describe("Relationship ID"),
+    id: idSchema.describe("Relationship ID"),
     type: z.enum(["call", "text", "email", "visit", "video_call"]).describe("Interaction type"),
     initiated_by: z.enum(["us", "them", "mutual"]).optional().describe("Who initiated"),
     duration_minutes: z.number().optional().describe("Duration in minutes"),
     notes: z.string().optional().describe("Notes about the interaction"),
-    date: z.string().optional().describe("Date of interaction (YYYY-MM-DD), defaults to today"),
+    date: dateSchema.optional().describe("Date of interaction (YYYY-MM-DD), defaults to today"),
   },
   async ({ id, type, initiated_by, duration_minutes, notes, date }) => {
     try {
@@ -305,8 +314,8 @@ server.tool(
   "log_visit",
   "Log a helper visit",
   {
-    id: z.number().describe("Helper ID"),
-    visit_date: z.string().optional().describe("Visit date (YYYY-MM-DD), defaults to today"),
+    id: idSchema.describe("Helper ID"),
+    visit_date: dateSchema.optional().describe("Visit date (YYYY-MM-DD), defaults to today"),
     notes: z.string().optional().describe("Notes about the visit"),
   },
   async ({ id, visit_date, notes }) => {
@@ -326,10 +335,10 @@ server.tool(
   "log_payment",
   "Log a payment to a helper",
   {
-    id: z.number().describe("Helper ID"),
-    amount: z.number().describe("Payment amount"),
+    id: idSchema.describe("Helper ID"),
+    amount: z.number().positive("Amount must be greater than zero").describe("Payment amount"),
     payment_method: z.string().optional().describe("Payment method (cash, venmo, check, etc.)"),
-    visit_date: z.string().optional().describe("For which visit date (YYYY-MM-DD)"),
+    visit_date: dateSchema.optional().describe("For which visit date (YYYY-MM-DD)"),
     notes: z.string().optional().describe("Payment notes"),
   },
   async ({ id, amount, payment_method, visit_date, notes }) => {
@@ -375,7 +384,7 @@ server.tool(
   "complete_maintenance",
   "Mark a maintenance item as complete",
   {
-    id: z.number().describe("Maintenance item ID"),
+    id: idSchema.describe("Maintenance item ID"),
     notes: z.string().optional().describe("Completion notes"),
   },
   async ({ id, notes }) => {
@@ -395,7 +404,7 @@ server.tool(
   "quick_capture",
   "Natural language capture — describe what happened and it will be routed to the right tool. Examples: 'called Mom', 'completed laundry task', 'dog walker came Tuesday', 'pay Maria $150'",
   {
-    text: z.string().describe("Natural language description of what to capture"),
+    text: z.string().min(1, "Text cannot be empty").max(1000).describe("Natural language description of what to capture"),
   },
   async ({ text }) => {
     try {
