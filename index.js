@@ -472,6 +472,31 @@ server.tool(
   }
 );
 
+// ── create_maintenance ───────────────────────────────────────────────────────
+
+server.tool(
+  "create_maintenance",
+  "Add a new home maintenance item to track",
+  {
+    title: z.string().min(1, "Title cannot be empty").max(500).describe("Maintenance item title"),
+    description: z.string().optional().describe("Detailed description"),
+    category: z.string().optional().describe("Category (HVAC, plumbing, exterior, appliances, etc.)"),
+    frequency_days: z.number().int().positive().optional().describe("Recurrence frequency in days"),
+    next_due_date: dateSchema.optional().describe("Next due date (YYYY-MM-DD)"),
+  },
+  async ({ title, description, category, frequency_days, next_due_date }) => {
+    try {
+      const body = { title };
+      if (description) body.description = description;
+      if (category) body.category = category;
+      if (frequency_days) body.frequency_days = frequency_days;
+      if (next_due_date) body.next_due_date = next_due_date;
+      const data = await api("POST", "/maintenance", body);
+      return textResult(`✅ Maintenance item added: "${data.data?.title || title}" (ID: ${data.data?.id})`);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
 // ── complete_maintenance ─────────────────────────────────────────────────────
 
 server.tool(
