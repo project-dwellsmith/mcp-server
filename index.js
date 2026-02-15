@@ -285,6 +285,29 @@ server.tool(
   }
 );
 
+// ── create_relationship ──────────────────────────────────────────────────────
+
+server.tool(
+  "create_relationship",
+  "Add a new relationship/contact to track",
+  {
+    name: z.string().min(1, "Name cannot be empty").max(200).describe("Person's name"),
+    category: z.string().optional().describe("Category (family, friend, neighbor, coworker, etc.)"),
+    contact_frequency_days: z.number().int().positive().optional().describe("How often to stay in touch (days)"),
+    notes: z.string().optional().describe("Notes about this person"),
+  },
+  async ({ name, category, contact_frequency_days, notes }) => {
+    try {
+      const body = { name };
+      if (category) body.category = category;
+      if (contact_frequency_days) body.contact_frequency_days = contact_frequency_days;
+      if (notes) body.notes = notes;
+      const data = await api("POST", "/relationships", body);
+      return textResult(`✅ Relationship added: "${data.data?.name || name}" (ID: ${data.data?.id})`);
+    } catch (err) { return errorResult(err); }
+  }
+);
+
 // ── due_contacts ─────────────────────────────────────────────────────────────
 
 server.tool(
@@ -348,6 +371,33 @@ server.tool(
         `• [${h.id}] ${h.name} — ${h.role || "helper"}${h.rate ? ` ($${h.rate})` : ""}`
       );
       return textResult(lines.join("\n"));
+    } catch (err) { return errorResult(err); }
+  }
+);
+
+// ── create_helper ────────────────────────────────────────────────────────────
+
+server.tool(
+  "create_helper",
+  "Add a new household helper (cleaner, dog walker, handyman, etc.)",
+  {
+    name: z.string().min(1, "Name cannot be empty").max(200).describe("Helper's name"),
+    role: z.string().optional().describe("Role (cleaner, dog walker, handyman, babysitter, etc.)"),
+    rate: z.number().positive().optional().describe("Standard rate/payment amount"),
+    phone: z.string().optional().describe("Phone number"),
+    email: z.string().email().optional().describe("Email address"),
+    notes: z.string().optional().describe("Notes about this helper"),
+  },
+  async ({ name, role, rate, phone, email, notes }) => {
+    try {
+      const body = { name };
+      if (role) body.role = role;
+      if (rate) body.rate = rate;
+      if (phone) body.phone = phone;
+      if (email) body.email = email;
+      if (notes) body.notes = notes;
+      const data = await api("POST", "/helpers", body);
+      return textResult(`✅ Helper added: "${data.data?.name || name}" (ID: ${data.data?.id})`);
     } catch (err) { return errorResult(err); }
   }
 );
