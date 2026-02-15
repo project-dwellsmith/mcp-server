@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "setup": "node setup.js"
+    "setup": "node setup.js",
+    "test": "node test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
