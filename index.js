@@ -90,6 +90,35 @@ const server = new McpServer({
   version: "0.1.0",
 });
 
+// ── health_check ─────────────────────────────────────────────────────────────
+
+server.tool(
+  "health_check",
+  "Test the connection to Dwellsmith — verifies authentication and API availability",
+  {},
+  async () => {
+    try {
+      const start = Date.now();
+      const data = await api("GET", "/household");
+      const elapsed = Date.now() - start;
+      const householdName = data.data?.name || "Unknown";
+      return textResult(
+        `✅ Connected to Dwellsmith\n` +
+        `• Household: ${householdName}\n` +
+        `• API: ${BASE_URL}\n` +
+        `• Response time: ${elapsed}ms`
+      );
+    } catch (err) {
+      return textResult(
+        `❌ Connection failed\n` +
+        `• API: ${BASE_URL}\n` +
+        `• Error: ${err.message}\n\n` +
+        `Try running \`node setup.js\` to re-authenticate.`
+      );
+    }
+  }
+);
+
 // ── list_tasks ───────────────────────────────────────────────────────────────
 
 server.tool(
